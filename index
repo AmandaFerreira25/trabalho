@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja Cuidado de Criança</title>
+    <!-- Inclui Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter como padrão */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        /* Estilos adicionais para o card de roupa */
+        .card-roupa {
+            transition: all 0.3s ease;
+        }
+        .card-roupa:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .form-input {
+            width: 100%; 
+            padding: 0.5rem 0.75rem; 
+            border: 1px solid #d1d5db; 
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: all 0.15s;
+        }
+        .form-input:focus {
+            outline: 2px solid transparent; 
+            outline-offset: 2px; 
+            --tw-ring-opacity: 1;
+            --tw-ring-color: #4f46e5; /* indigo-600 */
+            box-shadow: 0 0 0 2px var(--tw-ring-color);
+            border-color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Cabeçalho -->
+        <header class="text-center py-6 mb-8 bg-white shadow-lg rounded-xl">
+            <h1 class="text-4xl font-extrabold text-indigo-700">Bem-Vindo ao Cuidado de Criança</h1>
+            <p class="text-lg text-gray-500 mt-2">Adicione itens para começar! Atualmente, o estoque está com {{ estoque|length }} item(s).</p>
+        </header>
+
+        <!-- Mensagens de Feedback -->
+        {% if mensagem %}
+        <div class="p-4 mb-6 rounded-lg font-medium 
+                    {% if 'Sucesso' in mensagem %} bg-green-100 text-green-800 border border-green-300
+                    {% elif 'Erro' in mensagem %} bg-red-100 text-red-800 border border-red-300
+                    {% else %} bg-blue-100 text-blue-800 border border-blue-300 {% endif %}">
+            {{ mensagem }}
+        </div>
+        {% endif %}
+
+        <!-- Formulário 1: Adicionar Novo Produto -->
+        <section class="bg-indigo-50 p-6 mb-8 rounded-xl shadow-lg border border-indigo-200">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4 border-b pb-2">➕ Adicionar Novo Produto</h2>
+            <form action="{{ url_for('adicionar_roupa') }}" method="post" class="grid grid-cols-2 md:grid-cols-6 gap-4 items-end">
+                
+                <div class="md:col-span-2">
+                    <label for="nome" class="block text-sm font-medium text-gray-600 mb-1">Nome</label>
+                    <input type="text" id="nome" name="nome" required class="form-input" placeholder="Camiseta Básica">
+                </div>
+                <div>
+                    <label for="tamanho" class="block text-sm font-medium text-gray-600 mb-1">Tam.</label>
+                    <input type="text" id="tamanho" name="tamanho" required class="form-input" placeholder="P, M, G, 38, 40">
+                </div>
+                <div>
+                    <label for="cor" class="block text-sm font-medium text-gray-600 mb-1">Cor</label>
+                    <input type="text" id="cor" name="cor" required class="form-input" placeholder="Azul">
+                </div>
+                <div>
+                    <label for="preco" class="block text-sm font-medium text-gray-600 mb-1">Preço (R$)</label>
+                    <input type="number" step="0.01" id="preco" name="preco" required class="form-input" min="0.01" placeholder="49.90">
+                </div>
+                <div>
+                    <label for="estoque" class="block text-sm font-medium text-gray-600 mb-1">Estoque Inicial</label>
+                    <input type="number" id="estoque" name="estoque" required class="form-input" min="0" value="1" placeholder="10">
+                </div>
+                <div class="md:col-span-1">
+                    <label for="codigo" class="block text-sm font-medium text-gray-600 mb-1">Cód. (Opcional)</label>
+                    <input type="number" id="codigo" name="codigo" class="form-input" placeholder="101">
+                </div>
+
+                <div class="md:col-span-6">
+                    <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-150 shadow-md transform hover:scale-[1.01] mt-2">
+                        Adicionar ao Estoque
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Formulário 2: Venda Rápida -->
+        <section class="bg-white p-6 mb-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">🛒 Realizar Venda Rápida</h2>
+            <form action="{{ url_for('vender') }}" method="post" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label for="codigo_venda" class="block text-sm font-medium text-gray-600 mb-1">Cód. Produto</label>
+                    <input type="number" id="codigo_venda" name="codigo" required class="form-input" placeholder="Ex: 101">
+                </div>
+                <div>
+                    <label for="quantidade_venda" class="block text-sm font-medium text-gray-600 mb-1">Quantidade</label>
+                    <input type="number" id="quantidade_venda" name="quantidade" required min="1" value="1" class="form-input">
+                </div>
+                <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition duration-150 shadow-md transform hover:scale-[1.01]">
+                    Vender Item
+                </button>
+            </form>
+        </section>
+
+
+        <!-- Relatório de Estoque Baixo -->
+        {% if relatorio_baixo_estoque %}
+        <section class="bg-yellow-50 p-6 mb-8 rounded-xl shadow-lg border border-yellow-300">
+            <h2 class="text-2xl font-semibold text-yellow-700 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                 Alerta de Estoque Baixo
+            </h2>
+            <ul class="list-disc pl-5 space-y-2 text-yellow-800">
+                {% for alerta in relatorio_baixo_estoque %}
+                    <li>{{ alerta }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        <!-- Estoque Completo -->
+        <section class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">Estoque Completo</h2>
+            
+            {% if estoque|length == 0 %}
+                <div class="text-center p-10 border-2 border-dashed border-gray-300 rounded-lg text-gray-500">
+                    <p class="text-xl font-medium">O estoque está vazio. Adicione o primeiro produto acima!</p>
+                </div>
+            {% else %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for roupa in estoque %}
+                    <div class="card-roupa p-4 border rounded-lg shadow-sm 
+                                {% if roupa.estoque < 3 %} 
+                                    border-red-400 bg-red-50 
+                                {% elif roupa.estoque < 8 %}
+                                    border-yellow-400 bg-yellow-50
+                                {% else %}
+                                    border-gray-200 bg-white
+                                {% endif %}">
+                        <p class="text-xs font-bold 
+                                    {% if roupa.estoque < 3 %} text-red-600 {% else %} text-indigo-500 {% endif %}">
+                            CÓDIGO: {{ roupa.codigo }}
+                        </p>
+                        <h3 class="text-xl font-bold mt-1 text-gray-800">{{ roupa.nome }}</h3>
+                        <div class="mt-3 space-y-1 text-sm text-gray-600">
+                            <p><strong>Tamanho:</strong> <span class="font-medium text-gray-700">{{ roupa.tamanho }}</span></p>
+                            <p><strong>Cor:</strong> <span class="font-medium text-gray-700">{{ roupa.cor }}</span></p>
+                            <p><strong>Preço:</strong> <span class="font-bold text-green-600">R$ {{ "%.2f"|format(roupa.preco) }}</span></p>
+                        </div>
+                        <div class="mt-4 p-2 rounded-md font-semibold text-center 
+                                    {% if roupa.estoque < 3 %} 
+                                        bg-red-200 text-red-800
+                                    {% elif roupa.estoque < 8 %}
+                                        bg-yellow-200 text-yellow-800
+                                    {% else %}
+                                        bg-indigo-100 text-indigo-800
+                                    {% endif %}">
+                            Estoque: {{ roupa.estoque }} Unid.
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    </div>
+    
+</body>
+</html>
+<div class="card-roupa p-4 border rounded-lg shadow-sm 
+            {% if roupa.estoque < 3 %} 
+                border-red-400 bg-red-50 
+            {% elif roupa.estoque < 8 %}
+                border-yellow-400 bg-yellow-50
+            {% else %}
+                border-gray-200 bg-white
+            {% endif %}">
+    <p class="text-xs font-bold 
+                {% if roupa.estoque < 3 %} text-red-600 {% else %} text-indigo-500 {% endif %}">
+        CÓDIGO: {{ roupa.codigo }}
+    </p>
+    <h3 class="text-xl font-bold mt-1 text-gray-800">{{ roupa.nome }}</h3>
+    <div class="mt-3 space-y-1 text-sm text-gray-600">
+        <p><strong>Tamanho:</strong> <span class="font-medium text-gray-700">{{ roupa.tamanho }}</span></p>
+        <p><strong>Cor:</strong> <span class="font-medium text-gray-700">{{ roupa.cor }}</span></p>
+        <p><strong>Preço:</strong> <span class="font-bold text-green-600">R$ {{ "%.2f"|format(roupa.preco) }}</span></p>
+    </div>
+    <div class="mt-4 p-2 rounded-md font-semibold text-center 
+                {% if roupa.estoque < 3 %} 
+                    bg-red-200 text-red-800
+                {% elif roupa.estoque < 8 %}
+                    bg-yellow-200 text-yellow-800
+                {% else %}
+                    bg-indigo-100 text-indigo-800
+                {% endif %}">
+        Estoque: {{ roupa.estoque }} Unid.
+    </div>
+
+    <!-- 🔴 Botão de Excluir -->
+    <div class="mt-4 flex justify-center">
+        <a href="{{ url_for('excluir', codigo=roupa.codigo) }}" 
+           onclick="return confirm('Tem certeza que deseja excluir {{ roupa.nome }} do estoque?')" 
+           class="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition duration-150 shadow-md">
+           Excluir
+        </a>
+    </div>
+</div>
